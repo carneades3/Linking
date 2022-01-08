@@ -1,39 +1,40 @@
-#ifndef VARIADIC_TEMPLATE_H
-#define VARIADIC_TEMPLATE_H
+#ifndef VARIADIC_TEMPLATE_HPP
+#define VARIADIC_TEMPLATE_HPP
 
 #include <iostream>
 #include <string>
 #include <limits>
+#include <regex>
+#include <cmath>
 
 using std::string;
+using std::regex;
 
 template <typename T>
 class Money {
 static_assert((std::numeric_limits<T>::is_integer || std::is_floating_point<T>::value) && "Number required.");
+   T amount {};
+   
+   static const regex & set_regex();
+   void calculate(const string & dollars, const long double cents = 0);
+   T calculate_dollars(const string & dollars) const;
 public:
    Money(const string & dollars, const long double cents);   
    Money(const string & dollars); 
    
    ~Money(); 
+   
+   T get_amount() const;
 
    static Money create(const string & dollars, const long double cents);
    static Money create(const string & dollars);
-};
-
-template <typename T>
-struct Creation {
-	template<typename... Args>
-	Money<T> operator()(Args...args) const {
-		return Money<T>::create(std::forward<Args>(args)...);
-	}
-};
-
-template <class Type, template<typename> class Template>
-struct Constructor {
-	template<typename... Args>
-	Template<Type> operator()(Args...args) const {
-		return Template<Type>(std::forward<Args>(args)...);
-	}
+   
+   static const regex REGEX;
+   static const string TYPE_NAME;
+   
+   static T round(const long double x) {
+      return static_cast<T>(floor(x + 0.5));
+   }
 };
 
 #include "variadic_template.cpp"
